@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
             val queryString = if (ed_food_name.length() < 1)
                 "SELECT * FROM myFoodTable"
             else
-                "SELECT * FROM myFoodTable WHERE food_name LIKE '${ed_food_name.text}'"
+                "SELECT * FROM myFoodTable WHERE food_name LIKE '%${ed_food_name.text}%'"
             val c = dbrw.rawQuery(queryString, null)
             c.moveToFirst() //從第一筆開始輸出
             items.clear() //清空舊資料
