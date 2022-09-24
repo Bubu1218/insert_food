@@ -1,9 +1,13 @@
 package com.example.insert_food
 
 import android.database.sqlite.SQLiteDatabase
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextUtils
+import android.text.TextWatcher
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+
 
 class MainActivity : AppCompatActivity() {
     private var items: ArrayList<String> = ArrayList()
@@ -108,6 +112,31 @@ class MainActivity : AppCompatActivity() {
             adapter.notifyDataSetChanged() //更新列表資料
             c.close() //關閉 Cursor
         }
+
+        //即時更新listview(輸入不用enter即查詢資料庫內的資料)
+        ed_food_name.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                //若無輸入品名則 SQL 語法為查詢全部菜色，反之查詢該品名資料
+                val queryString = "SELECT * FROM myFoodTable WHERE food_name LIKE '%${ed_food_name.text}%'"
+                val c = dbrw.rawQuery(queryString, null)
+                c.moveToFirst() //從第一筆開始輸出
+                items.clear() //清空舊資料
+                showToast("共有${c.count}筆資料")
+                for (i in 0 until c.count) {
+                    //加入新資料
+                    items.add("品名:${c.getString(0)}\t\t\t\t\t\t\t\t\t\t 熱量:${c.getInt(1)}")
+                    c.moveToNext() //移動到下一筆
+                }
+                adapter.notifyDataSetChanged() //更新列表資料
+                c.close() //關閉 Cursor
+            }
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+        })
     }
     //建立 showToast 方法顯示 Toast 訊息
     private fun showToast(text: String) =
